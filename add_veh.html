@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script type="module">
+        import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+        const supabase = createClient("https://jfiyxalhahxdiyhwkkoi.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmaXl4YWxoYWh4ZGl5aHdra29pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIxODE4OTgsImV4cCI6MjA2Nzc1Nzg5OH0.xRKMdw-PbztwQEvBKVWt_PmnEfEGUavjP21aW4HMW7o");
+
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get("id");
+
+        const table = document.getElementById("main_table");
+        const owner = document.getElementById("owner");
+        const name = document.getElementById("name");
+        const description = document.getElementById("description");
+        const type = document.getElementById("type");
+        const status = document.getElementById("status");
+        const imageFile = document.getElementById("imageFile");
+
+        async function loadOption() {
+            const {data, error} = await supabase
+                .from('nations_full')
+                .select('*');
+
+            if (error) return console.error(error);
+
+            data.forEach(element => {
+                const opt = document.createElement('option');
+                opt.value = element.id;
+                opt.innerText = element.name;
+                owner.appendChild(opt)
+            });
+            table.style.display=""
+        }
+        loadOption()
+
+        async function saveData() {
+            var skip = false;
+            let image_url = null;
+            const file = imageFile.files[0];
+            if(file==null){
+                skip = true;
+            }
+            else if (file.size > 5 * 1024 * 1024) {  // 5MB limit
+                alert('File size must be 5MB or less.');
+                return;
+            } 
+
+            if(!skip){
+            const fileExt = file.name.split('.').pop();
+            const fileName = `file_${id}.PNG`;
+            const filePath = `${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('vs-smp-image-files')   // replace with your bucket name
+                .upload(filePath, file,{upsert: true,});
+
+
+                if (uploadError) {
+                    alert('Image upload failed: ' + uploadError.message);
+                    console.log(uploadError.message)
+                    return;
+                }
+
+                 // Get the public URL of the uploaded file
+            const { data: publicUrlData } = supabase.storage
+                .from('vs-smp-image-files')
+                .getPublicUrl(filePath);
+
+            image_url = publicUrlData.publicUrl;
+            }
+
+
+            let updates ={
+                nation_id: owner.value,
+                name: name.value,
+                description: description.value,
+                type: type.value,
+                status: status.value,
+                image_url: image_url
+            }
+
+
+            const { error } = await supabase
+                .from("vehicles")
+                .insert(updates)
+                .select();
+
+                if (error) {
+                    console.error(error);
+                    alert("Failed to save.");
+                } else {
+                    alert("Changes saved!");
+                    window.location.href = "vehicleList.html";
+                }
+        }
+        document.getElementById("save-btn").addEventListener("click", saveData);
+
+
+        document.getElementById("exit").addEventListener("click", ()=>{window.location.href = "vehicleList.html";});
+    </script>
+</head>
+<style>
+*{
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    text-align: center;
+    background-color: #2c2c2c;
+    color: rgb(235, 235, 235);
+}
+table{
+    border: 1px rgb(77, 219, 219) solid;
+    border-radius: 5%;
+    width: 100%;
+}
+td{
+    font-size: larger;
+    border: 1px rgb(133, 133, 133) solid;
+    border-radius: 5%;
+}
+</style>
+<body>
+    <header><h1>VS:SMP Vehicle Registry</h1></header>
+    <h2>Edit Nation</h2>
+    <table id="main_table" style="display: none;">
+            <tr>
+                <th>Owner</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Image</th>
+            </tr>
+            <tr>
+                <td><select id="owner"></select></td>
+                <td><input type="text" id="name"></td>
+                <td><textarea id="description"></textarea></td>
+                <td>
+                    <select id="type">
+                        <option value="WATER">WATER</option>
+                        <option value="LAND">LAND</option>
+                        <option value="AIR">AIR</option>
+                        <option value="ELSE">ELSE</option>
+                    </select>
+                </td>
+                <td>
+                    <select id="status">
+                        <option value="IN STORAGE">IN STORAGE</option>
+                        <option value="IN WORLD">IN WORLD</option>
+                        <option value="IN BATTLE">IN BATTLE</option>
+                        <option value="LOST">LOST</option>
+                        <option value="DESTROYED">DESTROYED</option>
+                        <option value="STOLEN">STOLEN</option>
+                        <option value="IN REPAIR">IN REPAIR</option>
+                        <option value="N/A">N/A</option>
+                    </select>
+                </td>
+                <td><input type="file" id="imageFile" accept="image/*" required /></td>
+            </tr>
+            <tr>
+                <th colspan="3"><button id="save-btn">SAVE</button></th>
+                <th colspan="3"><button id="exit">EXIT</button></th>
+            </tr>
+    </table>
+    
+</body>
+</html>

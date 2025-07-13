@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script type="module">
+        import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+        const supabase = createClient("https://jfiyxalhahxdiyhwkkoi.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmaXl4YWxoYWh4ZGl5aHdra29pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIxODE4OTgsImV4cCI6MjA2Nzc1Nzg5OH0.xRKMdw-PbztwQEvBKVWt_PmnEfEGUavjP21aW4HMW7o");
+
+        const table = document.getElementById("main_table")
+
+        async function saveData() {
+            const updates ={
+                name: document.getElementById("name").value,
+                leader_ign: document.getElementById("leader").value,
+                size: document.getElementById("size").value,
+                is_at_war: document.getElementById("is_at_war").checked
+            }
+
+            const { error } = await supabase
+                .from("nations")
+                .insert(updates)
+                .select();
+
+                if (error) {
+                    console.error(error);
+                    alert("Failed to save.");
+                } else {
+                    alert("Changes saved!");
+                    //window.location.href = "index.html";
+                }
+        }
+        document.getElementById("save-btn").addEventListener("click", saveData);
+        document.getElementById("exit").addEventListener("click", ()=>{window.location.href = "index.html";});
+    </script>
+</head>
+<style>
+    *{
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    text-align: center;
+    background-color: #2c2c2c;
+    color: rgb(235, 235, 235);
+}
+table{
+    border: 1px rgb(77, 219, 219) solid;
+    border-radius: 5%;
+    width: 100%;
+}
+td{
+    font-size: larger;
+    border: 1px rgb(133, 133, 133) solid;
+    border-radius: 5%;
+}
+</style>
+<body>
+    <header><h1>VS:SMP Vehicle Registry</h1></header>
+    <h2>Edit Nation</h2>
+    <table id="main_table">
+            <tr>
+                <th>Name</th>
+                <th>Leader</th>
+                <th>Size</th>
+                <th>Is At War</th>
+            </tr>
+            <tr>
+                <td><input type="text" id="name"></td>
+                <td><input type="text" id="leader"></td>
+                <td>
+                    <select id="size">
+                        <option value="EXTRA SMALL">EXTRA SMALL</option>
+                        <option value="SMALL">SMALL</option>
+                        <option value="MEDIUM">MEDIUM</option>
+                        <option value="LARGE">LARGE</option>
+                        <option value="VERY LARGE">VERY LARGE</option>
+                        <option value="RUSSIA SIZED">RUSSIA SIZED</option>
+                    </select>
+                </td>
+                <td><input type="checkbox" id="is_at_war"></td>
+            </tr>
+            <tr>
+                <th colspan="2.5"><button id="save-btn">SAVE</button></th>
+                <th colspan="2.5"><button id="exit">EXIT</button></th>
+            </tr>
+    </table>
+    
+</body>
+</html>

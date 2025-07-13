@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script type="module">
+        import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+        const supabase = createClient("https://jfiyxalhahxdiyhwkkoi.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmaXl4YWxoYWh4ZGl5aHdra29pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIxODE4OTgsImV4cCI6MjA2Nzc1Nzg5OH0.xRKMdw-PbztwQEvBKVWt_PmnEfEGUavjP21aW4HMW7o");
+        
+        async function LoadTable() {
+            const {data,error} = await supabase
+                .from('vehicle_all')
+                .select('*')
+            console.log("success")
+            if (error) {
+                console.error('Error fetching items:', error);
+                return;
+            }
+
+            const table = document.getElementById("main_table")
+
+            data.forEach(element => {
+                const row = document.createElement('tr');
+                let imagesrc = element.image_url
+                if (imagesrc==null){
+                    imagesrc = "alpha_shelter_bar_no_caramel.png"
+                }
+                row.innerHTML=`
+                    <td class="edit-field"><a href="edit_veh.html?id=${element.id}">GEAR PNG</a></td>
+                    <td>${element.name}</td>
+                    <td>${element.nation}</td>
+                    <td>${element.description}</td>
+                    <td>${element.type}</td>
+                    <td>${element.status}</td>
+                    <td class="image-field"><img src="${imagesrc}"></td>
+                ` 
+                switch(element.status){
+                    case 'IN STORAGE':
+                        row.classList.add("inStorage")
+                        break;
+                    case 'IN WORLD':
+                        row.classList.add("inWorld")
+                        break;
+                    case 'IN BATTLE':
+                        row.classList.add("inBattle")
+                        break;
+                    case 'LOST':
+                        row.classList.add("Lost")
+                        break;
+                    case 'DESTROYED':
+                        row.classList.add("Detroyed")
+                        break;
+                    case 'STOLEN':
+                        row.classList.add("Stolen")
+                        break;
+                    case 'IN REPAIR':
+                        row.classList.add("inRepair")
+                        break;
+                }
+                table.appendChild(row)
+            });
+        }   
+        LoadTable()
+    </script>
+</head>
+<style>
+*{
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    text-align: center;
+    background-color: #2c2c2c;
+    color: rgb(235, 235, 235);
+}
+table{
+    border: 1px rgb(77, 219, 219) solid;
+    border-radius: 5%;
+    width: 100%;
+}
+td{
+    font-size: larger;
+    border: 1px rgb(133, 133, 133) solid;
+    border-radius: 5%;
+    height: 100px;
+}
+section{
+    background-color:rgb(59, 59, 59);
+    height: 20%;
+    border: 1px rgb(133, 133, 133) solid;
+    text-align: left;
+}
+main{
+    height: 80%;
+}
+img{
+    width: 100%; height: 100%; object-fit:fill;
+}
+.image-field{
+    width: 208px;
+    height: 117px;
+}
+.edit-field{
+    width: 117px;
+}
+
+</style>
+<script>
+    
+
+        function Filter(){
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("search");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("main_table");
+            tr = table.getElementsByTagName("tr");
+
+            for(i=0;i<tr.length;i++){
+                var tds = tr[i].getElementsByTagName("td")
+                console.log(i);
+                for(j=1;j<tds.length-1;j++){
+                    txtValue = tds[j].textContent||tds[j].innerText;
+                    if(txtValue.toUpperCase().indexOf(filter)>-1){
+                        tr[i].style.display = "";
+                        break;
+                    }else{
+                        tr[i].style.display = "none"
+                    }
+                }
+            }
+        }
+
+</script>
+<body>
+    <header><h1>VS:SMP Vehicle Registry</h1></header>
+    <section><a href="index.html">Main Page</a><a href="add_veh.html">Add Vehicle</a></section>
+    <main>
+        Search :<input type="search" onkeyup="Filter()" id="search">
+        <table id="main_table">
+            <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Nation</th>
+                <th>Description</th>
+                <th>Vehicle Type</th>
+                <th>Status</th>
+            </tr>
+        </table>
+    </main>
+    
+</body>
+</html>
