@@ -28,7 +28,7 @@
                     imagesrc = "alpha_shelter_bar_no_caramel.png"
                 }
                 row.innerHTML=`
-                    <td class="edit-field"><a href="edit_veh.html?id=${element.id}">GEAR PNG</a></td>
+                    <td class="edit-field"><a href="edit_veh.html?id=${element.id}"><img src="material-symbols--settings.png"></a></td>
                     <td>${element.name}</td>
                     <td>${element.nation}</td>
                     <td>${element.description}</td>
@@ -101,6 +101,7 @@ img{
 }
 .edit-field{
     width: 117px;
+    height: 117px;
 }
 
 </style>
@@ -132,7 +133,7 @@ img{
 </script>
 <body>
     <header><h1>VS:SMP Vehicle Registry</h1></header>
-    <section><a href="index.html">Main Page</a><a href="add_veh.html">Add Vehicle</a></section>
+    <section><a href="index.html">Main Page</a>  ||  <a href="add_veh.html">Add Vehicle</a></section>
     <main>
         Search :<input type="search" onkeyup="Filter()" id="search">
         <table id="main_table">
