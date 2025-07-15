@@ -40,7 +40,7 @@
 
         }
         async function onStart() {
-            loadOption()
+            await loadOption()
             const {data,error} = await supabase
                 .from('vehicles')
                 .select("*")
