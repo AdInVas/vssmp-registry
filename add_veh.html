@@ -9,8 +9,6 @@
 
         const supabase = createClient("https://jfiyxalhahxdiyhwkkoi.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmaXl4YWxoYWh4ZGl5aHdra29pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIxODE4OTgsImV4cCI6MjA2Nzc1Nzg5OH0.xRKMdw-PbztwQEvBKVWt_PmnEfEGUavjP21aW4HMW7o");
 
-        const params = new URLSearchParams(window.location.search);
-        const id = params.get("id");
 
         const table = document.getElementById("main_table");
         const owner = document.getElementById("owner");
@@ -37,6 +35,20 @@
         }
         loadOption()
 
+        async function getnextId() {
+            const { data, error } = await supabase
+                .from('your_table')
+                .select('id')
+                .order('id', { ascending: false })
+                .limit(1);
+
+                if (data && data.length > 0) {
+                    return data[0].id + 1;
+                } else {
+                    return 1;
+                }
+        }
+
         async function saveData() {
             var skip = false;
             let image_url = null;
@@ -49,9 +61,12 @@
                 return;
             } 
 
+            let nextId = await getnextId();
+            
+
             if(!skip){
             const fileExt = file.name.split('.').pop();
-            const fileName = `file_${id}.PNG`;
+            const fileName = `file_${nextId}.PNG`;
             const filePath = `${fileName}`;
 
             const { error: uploadError } = await supabase.storage
