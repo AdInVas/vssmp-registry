@@ -37,13 +37,10 @@
 
         async function getnextId() {
             const { data, error } = await supabase
-                .from('your_table')
-                .select('id')
-                .order('id', { ascending: false })
-                .limit(1);
-
+                .from("nextid")
+                .select("*")
                 if (data && data.length > 0) {
-                    return data[0].id + 1;
+                    return data[0].nextid;
                 } else {
                     return 1;
                 }
